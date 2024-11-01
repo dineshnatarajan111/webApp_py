@@ -1,7 +1,7 @@
 #!/bin/bash
 
 . ${WORKSPACE}/venv/bin/activate && pytest --junitxml=report.xml
-commitSHA=$GIT_COMMIT
+commitSHA=$(git log -n 1 --pretty=format:'%H')
 echo "commitSHA: $commitSHA"
 echo "GITHUB_REPO: $GITHUB_REPO"
 tests=$(xmllint --xpath 'string(//testsuite/@tests)' report.xml)
@@ -13,4 +13,4 @@ githubComment="Test Results for commit ${commitSHA}: \n- Total Tests: ${tests}\n
 curl -H "Authorization: token ${GITHUB_TOKEN}" \
         -X POST \
         -d '{ "body": "${githubComment}" }' \
-        "https://api.github.com/repos/${GITHUB_REPO}/commits/${commitSHA}/comments"
+        "http://localhost:53141/repos/${GITHUB_REPO}/commits/${commitSHA}/comments"
