@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . ${WORKSPACE}/venv/bin/activate && pytest --junitxml=report.xml
+git log -n 1 --pretty=format:'%H'
 commitSHA=$(git log -n 1 --pretty=format:'%H')
 echo "commitSHA: $commitSHA"
 echo "GITHUB_REPO: $GITHUB_REPO"
@@ -13,4 +14,4 @@ githubComment="Test Results for commit ${commitSHA}: \n- Total Tests: ${tests}\n
 curl -H "Authorization: token ${GITHUB_TOKEN}" \
         -X POST \
         -d '{ "body": "${githubComment}" }' \
-        "http://localhost:53141/repos/${GITHUB_REPO}/commits/${commitSHA}/comments"
+        "http://gitea-http:3000/repos/${GITHUB_REPO}/commits/${commitSHA}/comments"
