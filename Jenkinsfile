@@ -3,7 +3,7 @@ podTemplate(
     containers: [
         containerTemplate(
             name: 'py',
-            image: 'dinesh1705/py-jenkins-slave:3.0.0',
+            image: 'dinesh1705/py-jenkins-slave:3.0.2',
             ttyEnabled: true,
             command: 'cat'
         )    
