@@ -1,26 +1,39 @@
-import unittest
-from app import app
-import re
+import pytest
+from app import app, get_public_ip
+from unittest.mock import patch
 
-class TestPublicIP(unittest.TestCase):
+@pytest.fixture
+def client():
+    """Create a test client for the app."""
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
 
-    def setUp(self):
-        # Setup the Flask test client
-        self.app = app.test_client()
-        self.app.testing = True
+def test_get_public_ip_success():
+    """Test that get_public_ip() successfully retrieves an IP address."""
+    with patch('requests.get') as mock_get:
+        mock_get.return_value.json.return_value = {'ip': '123.123.123.123'}
+        mock_get.return_value.status_code = 200
+        ip = get_public_ip()
+        assert ip == '123.123.123.123'
 
-    def test_get_public_ip(self):
-        # Send a GET request to the root endpoint
-        response = self.app.get('/')
-        self.assertEqual(response.status_code, 200)
+def test_get_public_ip_failure():
+    """Test get_public_ip() returns None when request fails."""
+    with patch('requests.get') as mock_get:
+        mock_get.side_effect = requests.RequestException
+        ip = get_public_ip()
+        assert ip is None
 
-        # Verify the response contains a valid IP address format
-        ip_data = response.get_json()
-        ip_address = ip_data.get("public_ip", "")
+def test_public_ip_endpoint_success(client):
+    """Test the /public-ip endpoint returns the correct public IP."""
+    with patch('app.get_public_ip', return_value='123.123.123.123'):
+        response = client.get('/public-ip')
+        assert response.status_code == 200
+        assert response.json == {"public_ip": "123.123.123.123"}
 
-        # Regular expression for validating IPv4 addresses
-        ip_pattern = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
-        self.assertTrue(ip_pattern.match(ip_address), "Invalid IP address format")
-
-if __name__ == '__main__':
-    unittest.main()
+def test_public_ip_endpoint_failure(client):
+    """Test the /public-ip endpoint returns an error if IP fetching fails."""
+    with patch('app.get_public_ip', return_value=None):
+        response = client.get('/public-ip')
+        assert response.status_code == 500
+        assert response.json == {"error": "Unable to fetch public IP"}

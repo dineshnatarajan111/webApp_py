@@ -1,11 +1,26 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
+import requests
 
 app = Flask(__name__)
 
-@app.route('/')
 def get_public_ip():
-    user_ip = request.remote_addr  # This fetches the IP address of the requester
-    return jsonify({"public_ip": user_ip})
+    """Fetch public IP address from an external service."""
+    try:
+        response = requests.get('https://api.ipify.org?format=json')
+        response.raise_for_status()
+        return response.json().get('ip')
+    except requests.RequestException as e:
+        app.logger.error("Error fetching public IP: %s", e)
+        return None
+
+@app.route('/public-ip', methods=['GET'])
+def public_ip():
+    """Endpoint to return the public IP address."""
+    ip = get_public_ip()
+    if ip:
+        return jsonify({"public_ip": ip}), 200
+    else:
+        return jsonify({"error": "Unable to fetch public IP"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
