@@ -29,24 +29,17 @@ podTemplate(
                 withEnv([
                     'GITHUB_REPO=dineshnatarajan111/webApp_py'
                 ]){
+                    
                     container("py"){
                         sh"""
-                        . ${WORKSPACE}/venv/bin/activate && pytest --junitxml=report.xml'
-                        """
-                        def commitSHA = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                        def testResults = readFile('report.xml')  // Replace with your test results file
-                        def summary = testResults.count("tests=")
-                        def successCount = testResults.count("passed=")
-                        def failureCount = testResults.count("failed=")
-                        def githubComment = """
-                        Test Results for commit `${commitSHA}`:
-                        - Total Tests: ${summary}
-                        - Passed: ${successCount}
-                        - Failed: ${failureCount}
-                        """
-
-                        // Post the comment using GitHub API
-                        sh """
+                        . \${WORKSPACE}/venv/bin/activate && pytest --junitxml=report.xml
+                        commitSHA=\${env.GIT_COMMIT}
+                        tests=\$(xmllint --xpath 'string(//testsuite/@tests)' report.xml)
+                        errors=\$(xmllint --xpath 'string(//testsuite/@errors)' report.xml)
+                        failures=\$(xmllint --xpath 'string(//testsuite/@failures)' report.xml)
+                        # Assuming "passed" means tests - (errors + failures)
+                        passed=\$((tests - errors - failures))
+                        githubComment="Test Results for commit ${commitSHA}: \n- Total Tests: ${tests}\n- Passed: ${passed}\n- Failed: ${failures}
                         curl -H "Authorization: token ${env.GITHUB_TOKEN}" \
                                 -X POST \
                                 -d '{ "body": "${githubComment}" }' \
