@@ -23,10 +23,37 @@ podTemplate(
             }
         }
         stage("Unit Test"){
-            container("py"){
-                sh"""
-                . ${WORKSPACE}/venv/bin/activate && pytest --maxfail=1 --disable-warnings -v
-                """
+            withCredentials([
+                usernameColonPassword(credentialsId: '', variable: 'GITHUB_TOKEN')
+            ]){
+                withEnv([
+                    'GITHUB_REPO=dineshnatarajan111/webApp_py'
+                ]){
+                    container("py"){
+                        sh"""
+                        . ${WORKSPACE}/venv/bin/activate && pytest --junitxml=report.xml'
+                        """
+                        def commitSHA = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                        def testResults = readFile('report.xml')  // Replace with your test results file
+                        def summary = testResults.count("tests=")
+                        def successCount = testResults.count("passed=")
+                        def failureCount = testResults.count("failed=")
+                        def githubComment = """
+                        Test Results for commit `${commitSHA}`:
+                        - Total Tests: ${summary}
+                        - Passed: ${successCount}
+                        - Failed: ${failureCount}
+                        """
+
+                        // Post the comment using GitHub API
+                        sh """
+                        curl -H "Authorization: token ${env.GITHUB_TOKEN}" \
+                                -X POST \
+                                -d '{ "body": "${githubComment}" }' \
+                                "https://api.github.com/repos/${env.GITHUB_REPO}/commits/${commitSHA}/comments"
+                        """
+                    }
+                }
             }
         }
         stage("build"){
