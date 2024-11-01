@@ -24,7 +24,7 @@ podTemplate(
         }
         stage("Unit Test"){
             withCredentials([
-                usernameColonPassword(credentialsId: '', variable: 'GITHUB_TOKEN')
+                usernameColonPassword(credentialsId: 'jenkins-github-pat', variable: 'GITHUB_TOKEN')
             ]){
                 withEnv([
                     'GITHUB_REPO=dineshnatarajan111/webApp_py'
