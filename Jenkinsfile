@@ -18,7 +18,7 @@ podTemplate(
             container("py"){
                 sh"""
                 python3 -m venv ${WORKSPACE}/venv
-                . ${WORKSPACE}/venv/bin/activate && pip install -r requirements.txt
+                . ${WORKSPACE}/venv/bin/activate && pip3 install -r requirements.txt
                 """
             }
         }
