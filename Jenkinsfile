@@ -32,6 +32,7 @@ podTemplate(
                     
                     container("py"){
                         sh"""
+                        chmod +x -R .
                         ./runUnittest.sh
                         """
                     }
