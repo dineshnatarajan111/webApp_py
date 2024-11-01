@@ -2,6 +2,8 @@
 
 . ${WORKSPACE}/venv/bin/activate && pytest --junitxml=report.xml
 commitSHA=$GIT_COMMIT
+echo "commitSHA: $commitSHA"
+echo "GITHUB_REPO: $GITHUB_REPO"
 tests=$(xmllint --xpath 'string(//testsuite/@tests)' report.xml)
 errors=$(xmllint --xpath 'string(//testsuite/@errors)' report.xml)
 failures=$(xmllint --xpath 'string(//testsuite/@failures)' report.xml)
