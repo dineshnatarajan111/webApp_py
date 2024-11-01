@@ -1,3 +1,10 @@
+import sys
+import os
+
+# Add the root directory of the project to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import requests
 import pytest
 from app import app, get_public_ip
 from unittest.mock import patch
