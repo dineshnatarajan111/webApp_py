@@ -128,10 +128,10 @@ curl http://127.0.0.1:5000/
 ## CI/CD and Deployment
 
 ### Jenkins
-Continuous integration is managed through Jenkins. The Jenkins instance is localhost so Screen-Shots are pasted in image/jenkins.
+Continuous integration is managed through Jenkins. The Jenkins instance is localhost so Screen-Shots are pasted in images directory.
 
 ### Argo CD
-Deployment to the desired environment is managed by Argo CD, which provides a GitOps-based continuous deployment. The ArgoCD instance is localhost so Screen-Shots are pasted in image/Argo-CD.
+Deployment to the desired environment is managed by Argo CD, which provides a GitOps-based continuous deployment. The ArgoCD instance is localhost so Screen-Shots are pasted in images directory.
 
 ### Helm
 Helm is used to manage Kubernetes deployments, with values and configurations stored in the Helm repositories below:
