@@ -19,8 +19,9 @@ This is a Python Flask web application that, when accessed, returns a JSON objec
   - [Jenkins](#jenkins)
   - [Argo CD](#argo-cd)
   - [Helm](#helm)
+  - [Notifications and Test Result Updates](#notifications-and-test-result-updates)
+  - [Challenges Faced During Setup](#challenges-faced-during-setup)
 - [Example Response](#example-response)
-- [License](#license)
 
 ---
 
@@ -137,6 +138,23 @@ Deployment to the desired environment is managed by Argo CD, which provides a Gi
 Helm is used to manage Kubernetes deployments, with values and configurations stored in the Helm repositories below:
 - **Helm Chart Repository**: [https://github.com/dineshnatarajan111/webapp-helm-chart.git](https://github.com/dineshnatarajan111/webapp-helm-chart.git)
 - **Helm Values Repository** (current state documentation): [https://github.com/dineshnatarajan111/webapp-helm-values.git](https://github.com/dineshnatarajan111/webapp-helm-values.git)
+
+---
+
+### Notifications and Test Result Updates
+
+- **Email Notifications**: Email notifications are configured in Jenkins to alert on build status, but currently do not work due to the local Jenkins server setup. External email notifications may require a public or cloud-hosted Jenkins instance or additional SMTP configuration.
+- **GitHub Test Result Updates**: Test results from the Jenkins pipeline are successfully updated to GitHub, allowing you to view the latest test outcomes directly on the GitHub repository.
+
+---
+
+## Challenges Faced During Setup
+
+During the CI setup, we initially attempted to implement the solution using Kubernetes as the cloud environment. The approach was designed to execute scripts within containers in a Kubernetes pod, created at runtime for each Jenkins job. This method was challenging and required extensive research, especially around:
+- **Docker Base Image Creation**: Understanding the setup and requirements for Docker images to ensure they were optimized for the CI tasks.
+- **Runtime Management in Kubernetes Pods**: Ensuring that each Jenkins job could dynamically create and manage Kubernetes pods efficiently.
+
+Due to the complexity and the additional time required to configure Kubernetes for this purpose, we decided to simplify our approach. We transitioned to using Jenkins' **declarative syntax**, which provides a more straightforward, code-based configuration for defining CI stages and steps directly in Jenkinsfiles.
 
 ---
 
